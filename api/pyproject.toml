@@ -1,0 +1,25 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Patrik Michl", email = "xmichl@mendelu.cz"},
+]
+dependencies = [
+    "uuid>=1.30",
+    "pymongo>=4.6.0",
+    "uvicorn[standard]>=0.24.0.post1",
+    "fastapi>=0.104.1",
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+[tool.pdm.scripts]
+dev = "uvicorn src.main:app --reload"
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0.post1",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
