@@ -110,3 +110,14 @@ class MongoModel(BaseModel):
         docs = db.get_collection(collection_name).find(q)
         # db.die()
         return docs
+
+    @staticmethod
+    def remove_doc_by_id(collection_name: str, id: str):
+        db = Database()
+        q = {"_id": ObjectId(id)}
+        (
+            db
+            .get_collection(collection_name)
+            .delete_one(q)
+        )
+        db.die()

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from docs.tags import tags
 from fastapi import FastAPI, HTTPException
 
@@ -11,46 +13,87 @@ from src.schemas.MongoModel import OID
 
 app = FastAPI(openapi_tags=tags, port=51173)
 
+
 # TODO 1: validate ids to be valid ObjectIDs by decorator
 # TODO 2: handle security by decorator
 
 
 @app.get("/book/find_by_library/{library_id}", tags=["book"])
-async def get_books_from_library(library_id: str):
-    books = Book.get_books_by_library_id(library_id)
-    if not books:
+async def get_books_from_library(library_id: str, token: str):
+    if not get_library_by_id(library_id):
         raise HTTPException(
             status_code=404,
             detail="No such book."
         )
-    return {"data": books}
+    books = Book.get_books_by_library_id(library_id)
+    return books
 
 
 @app.get("/book/all_books", tags=["book"])
 async def get_books(token: str):
     libs_cursor = get_libraries(token)
+
     libs = [Library.from_mongo(document) for document in libs_cursor]
     books_list = [
         Book.get_books_by_library_id(lib.id)
         for lib in libs
     ]
     books = [item for sublist in books_list for item in sublist]
-    print(books)
     return books
 
 
 @app.get("/book/{book_id}", tags=["book"])
-async def get_book_by_id(book_id: str):
-    return {"data": Book.get_book_by_id(book_id)}
+async def get_book_by_id(book_id: str, token: str):
+    return Book.get_book_by_id(book_id)
 
 
-@app.get("/book/{isbn_or_custom_id}", tags=["book"])
-async def get_book_by_isbn(isbn: str) -> Book:
-    return {"message": f"{isbn}"}
+# @app.get("/book/{isbn_or_custom_id}", tags=["book"])
+# async def get_book_by_isbn(isbn: str) -> Book:
+#     return {"message": f"{isbn}"}
 
 
 @app.post("/book", tags=["book"])
-async def create_book(book: Book):
+async def create_book(
+        author: str,
+        title: str,
+        library: str,
+        isbn: str,
+        token: str,
+        subtitle=None,
+        pages=None,
+        read=False,
+        favourite=False,
+        cover=None,
+        publisher=None,
+        published=None
+):
+    book = Book(
+        author=author,
+        owner_id=token,
+        library=library,
+        title=title,
+        read=read,
+        favourite=favourite
+    )
+
+    if subtitle is not None:
+        book.subtitle = subtitle
+
+    if pages is not None:
+        book.pages = pages
+
+    if cover is not None:
+        book.cover = cover
+
+    if publisher is not None:
+        book.publisher = publisher
+
+    if published is not None:
+        book.published = published
+
+    if isbn is not None:
+        book.isbn = isbn
+
     return Book.get_book_by_id(book.create_book().id).to_response()
 
 
@@ -59,13 +102,22 @@ async def update_book(book: Book):
     return {"message": "book updated"}
 
 
+@app.get("/book/remove_by_id/{book_id}", tags=["book"])
+async def remove_book(book_id: str, token: str):
+    return Book.remove_book_by_id(book_id)
+
+
 @app.get("/library/all_libraries", tags=["library"])
 async def get_all_libraries(token: str):
     # lib = Library()
     # lib.owner_id = ""
     libs_cursor = get_libraries(token)
     # return {"data": libs}
-    libs = [Library.from_mongo(document) for document in libs_cursor]
+    libs = [Library.from_mongo(document)
+            .update_total()
+            .update_favourite()
+            .update_read()
+            for document in libs_cursor]
     return libs
 
 
@@ -82,8 +134,12 @@ async def create_library(name: str, token: str):
         name=name
     )
 
-    lib = library.create_library()
-    return {"data": lib.to_response()}
+    lib = (library
+           .create_library()
+           .update_total()
+           .update_favourite()
+           .update_read())
+    return lib.to_response()
 
 
 @app.put("/library", tags=["library"])

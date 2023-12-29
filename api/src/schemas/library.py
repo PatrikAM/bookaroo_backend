@@ -5,6 +5,8 @@ from uuid import uuid4
 
 from src.schemas.MongoModel import MongoModel, OID
 
+from src.schemas.book import Book
+
 library_tag = {
     "name": "library",
     "description": "Endpoints for your libraries.",
@@ -17,6 +19,9 @@ class Library(MongoModel):
     id: OID = Field(default_factory=uuid4)
     owner_id: OID = Field(default_factory=uuid4)
     name: str = Field()
+    total: int = Field(default=0)
+    favourite: int = Field(default=0)
+    read: int = Field(default=0)
 
     def create_library(self):
         db = Database()
@@ -36,6 +41,33 @@ class Library(MongoModel):
         )
         db.die()
         return get_library_by_id(self.id)
+
+    def update_total(self):
+        size = len(Book.get_books_by_library_id(self.id))
+        self.total = size
+        return self
+
+    def update_favourite(self):
+        favourites = list(
+            filter(
+                lambda book: book.favourite,
+                Book
+                .get_books_by_library_id(self.id)
+            )
+        )
+        self.favourite = len(favourites)
+        return self
+
+    def update_read(self):
+        reads = list(
+            filter(
+                lambda book: book.read,
+                Book
+                .get_books_by_library_id(self.id)
+            )
+        )
+        self.read = len(reads)
+        return self
 
 
 def get_library_by_id(lib_id):
