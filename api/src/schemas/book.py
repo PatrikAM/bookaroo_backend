@@ -25,7 +25,7 @@ class Book(MongoModel):
     favourite: bool = Field(default=False)
     cover: str = Field(default=None)
     publisher: str = Field(default=None)
-    published: float = Field(default=None)
+    published: int = Field(default=None)
 
     # description: str = Field(default=None)
 

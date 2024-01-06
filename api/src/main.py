@@ -101,7 +101,6 @@ async def create_book(
 async def update_book(book: Book):
     return {"message": "book updated"}
 
-
 @app.get("/book/remove_by_id/{book_id}", tags=["book"])
 async def remove_book(book_id: str, token: str):
     return Book.remove_book_by_id(book_id)
@@ -186,6 +185,12 @@ async def register(
 
 @app.post("/user/login", tags=["user"])
 async def login(login: str, password: str):
+
+    if login is None or password is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Both password and login are needed."
+        )
     user = User(
         login=login,
         password=password,
