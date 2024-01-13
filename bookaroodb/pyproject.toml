@@ -1,0 +1,23 @@
+[project]
+name = "bookaroodb"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Patrik Michl", email = "xmichl@mendelu.cz"},
+]
+dependencies = [
+    "grpcio>=1.60.0",
+    "google>=3.0.0",
+    "google-api-python-client>=2.113.0",
+    "pymongo>=4.6.1",
+    "pydantic>=2.5.3",
+]
+requires-python = "==3.9.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+package-type = "application"
+[tool.pdm.scripts]
+dev = "python3 ./src/main.py"

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+service RequestProcessor {
+    rpc process(Request) returns (Response);
+}
+
+enum Operation {
+    INSERT = 0;
+    SELECT = 1;
+    UPDATE = 2;
+    DELETE = 3;
+}
+
+message Request {
+    string collectionName = 1;
+    Operation operation = 2;
+    string data = 3;
+    string token = 4;
+    string query = 5;
+}
+
+message Response {
+    int32 code = 1;
+    string message = 2;
+}

@@ -70,6 +70,19 @@ class MongoModel(BaseModel):
 
         return response
 
+    def to_grpc(self):
+        response = {}
+
+        l = []
+        delimiter = ", "
+        for key, value in self.__dict__.items():
+
+            if value is not None:
+                l.append(f'\"{key}\": \"{value}"')
+                response[key] = str(value)
+
+        return "{ " + delimiter.join(l) + " }"
+
     def mongo(self, **kwargs):
         exclude_unset = kwargs.pop('exclude_unset', True)
         by_alias = kwargs.pop('by_alias', True)
@@ -112,6 +125,14 @@ class MongoModel(BaseModel):
         return docs
 
     @staticmethod
+    def fetch_all_docs(collection_name, ):
+        db = Database()
+        q = {}
+        docs = db.get_collection(collection_name).find(q)
+        # db.die()
+        return docs
+
+    @staticmethod
     def remove_doc_by_id(collection_name: str, id: str):
         db = Database()
         q = {"_id": ObjectId(id)}
@@ -119,5 +140,16 @@ class MongoModel(BaseModel):
             db
             .get_collection(collection_name)
             .delete_one(q)
+        )
+        db.die()
+
+    def update_doc_by_id(self, collection_name: str, id: str):
+        db = Database()
+        q = {"_id": id}
+        values = {"$set": self.mongo()}
+        (
+            db
+            .get_collection(collection_name)
+            .update_one(q, values)
         )
         db.die()

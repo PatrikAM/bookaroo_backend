@@ -25,9 +25,13 @@ class Book(MongoModel):
     favourite: bool = Field(default=False)
     cover: str = Field(default=None)
     publisher: str = Field(default=None)
-    published: int = Field(default=None)
+    published: str = Field(default=None)
 
     # description: str = Field(default=None)
+
+    def update_book(self):
+        self.update_doc_by_id(book_collection_name, self.id)
+        return Book.get_book_by_id(self.id)
 
     def create_book(self):
         # db = Database()
@@ -44,7 +48,8 @@ class Book(MongoModel):
         # doc = db.get_collection(book_collection_name).find_one(q)
         # db.die()
         doc = MongoModel.fetch_doc(book_collection_name, book_id)
-        return Book.from_mongo(doc)
+        book = Book.from_mongo(doc)
+        return book
 
     @staticmethod
     def get_books_by_library_id(lib_id: str):

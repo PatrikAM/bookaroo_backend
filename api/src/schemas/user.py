@@ -87,6 +87,14 @@ class User(MongoModel):
         # If all conditions are met, the password is considered valid
         return True
 
+    @staticmethod
+    def get_users():
+        docs = MongoModel.fetch_all_docs(
+            user_collection_name
+        )
+        readers = [User.from_mongo(document) for document in docs]
+        return readers
+
 
 def hash_password(password: str) -> str:
     password += salt
