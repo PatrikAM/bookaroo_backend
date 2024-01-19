@@ -24,7 +24,7 @@ services:
       - ./database/production:/Databases/production
   mongo-express:
     image: mongo-express
-    container_name: mexpress
+    container_name: bookaroo-mexpress
     environment:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=root
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
@@ -37,7 +37,7 @@ services:
       - "8081:8081"
   db:
     image: postgres
-    container_name: bookaroo_logs-db-mongo
+    container_name: bookaroo_logs-db-postgres
     environment:
       - POSTGRES_USER=example
       - POSTGRES_PASSWORD=example
@@ -50,5 +50,25 @@ services:
 
   adminer:
     image: adminer
+    container_name: bookaroo_logs-adminer
     ports:
       - 8080:8080
+
+  api:
+    build: .
+    container_name: bookaroo-api
+    ports:
+      - 8000:8000
+      - 51173:51173
+
+#  logger:
+#    build: logger
+#    container_name: bookaroo-logger
+#    ports:
+#      - 8000:8000
+
+#  bookarodb:
+#    build: bookaroodb
+#    container_name: bookaroo-db-service
+#    ports:
+#      - 8000:8000

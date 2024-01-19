@@ -5,7 +5,8 @@ from Database import Database
 
 
 class RabbitMq:
-    __conn_params__ = pika.ConnectionParameters(host='127.0.0.1')
+    __conn_params__ = pika.ConnectionParameters(host='rabbitmq')
+    # __conn_params__ = pika.ConnectionParameters(host='127.0.0.1')
     __routing_key__ = 'bookaroo-logs'
 
     def publish(self, msg: str):

@@ -6,7 +6,8 @@ class Database:
     db = None
 
     def __create_conn(self):
-        self.client = pymongo.MongoClient("mongodb://%s:%s@localhost:27017/" % ("root", "password"))
+        # self.client = pymongo.MongoClient("mongodb://%s:%s@localhost:27017/" % ("root", "password"))
+        self.client = pymongo.MongoClient("mongodb://%s:%s@mongo:27017/" % ("root", "password"))
 
     def __open_db(self):
         self.__create_conn()

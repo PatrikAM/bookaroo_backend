@@ -23,7 +23,8 @@ class Database:
             autocommit=False,
             autoflush=False,
             bind=create_engine(
-                "postgresql://example:example@localhost/boookaroo_logs"
+                "postgresql://example:example@db/boookaroo_logs"
+                # "postgresql://example:example@localhost/boookaroo_logs"
             )
         )
         try:
@@ -48,9 +49,9 @@ class Database:
         # db2.close()
         # return db_review
 
-        # try:
+        try:
             engine = create_engine(
-                'postgresql://example:example@localhost:5432/bookaroo_logs')
+                'postgresql://example:example@db:5432/bookaroo_logs')
             Base.metadata.create_all(engine)
             session = Session(engine)
             l = BookarooLog(id=uuid.uuid4(), **log.__dict__)
@@ -59,5 +60,5 @@ class Database:
             session.commit()
             session.refresh(l)
             session.close()
-        # except Exception as e:
-        #     print('Unable to access postgresql database', repr(e))
+        except Exception as e:
+            print('Unable to access postgresql database', repr(e))

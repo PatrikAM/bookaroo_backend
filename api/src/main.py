@@ -304,7 +304,11 @@ async def get_all_libraries(
             status_code=response.code,
             detail=response.message
         )
-    return json.loads(response.message)
+    libs = []
+    for lib in json.loads(response.message):
+        libs.append(Library(**lib))
+    return libs
+    # return json.loads(response.message)
 
 
 @app.get("/library/{library_id}", tags=["library"])
@@ -333,7 +337,7 @@ async def get_library(
             status_code=response.code,
             detail=response.message
         )
-    return json.loads(response.message)
+    return Library(**json.loads(response.message))
 
 
 @app.post("/library", tags=["library"])
@@ -372,7 +376,7 @@ async def create_library(
             status_code=response.code,
             detail=response.message
         )
-    return json.loads(response.message)
+    return Library(**json.loads(response.message))
 
 
 @app.put("/library", tags=["library"])
@@ -408,7 +412,7 @@ async def update_library(
             status_code=response.code,
             detail=response.message
         )
-    return json.loads(response.message)
+    return Library(**json.loads(response.message))
 
 
 @app.post("/user/register", tags=["user"])
